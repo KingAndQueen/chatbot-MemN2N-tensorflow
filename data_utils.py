@@ -4,7 +4,7 @@ import os
 import re
 import numpy as np
 import tensorflow as tf
-
+import pdb
 stop_words=set(["a","an","the"])
 
 
@@ -112,6 +112,7 @@ def parse_dialogs_per_response(lines,candid_dic):
     context=[]
     u=None
     r=None
+    # pdb.set_trace()
     for line in lines:
         line=line.strip()
         if line:
