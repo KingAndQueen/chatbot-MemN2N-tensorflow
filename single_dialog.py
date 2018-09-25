@@ -10,6 +10,7 @@ import sys
 import tensorflow as tf
 import numpy as np
 import os
+import pdb
 
 tf.flags.DEFINE_float("learning_rate", 0.001,
                       "Learning rate for Adam Optimizer.")
@@ -82,8 +83,10 @@ class chatBot(object):
     def build_vocab(self, data, candidates):
         vocab = reduce(lambda x, y: x | y, (set(
             list(chain.from_iterable(s)) + q) for s, q, a in data))
+        # pdb.set_trace()
         vocab |= reduce(lambda x, y: x | y, (set(candidate)
                                              for candidate in candidates))
+        # pdb.set_trace()
         vocab = sorted(vocab)
         self.word_idx = dict((c, i + 1) for i, c in enumerate(vocab))
         max_story_size = max(map(len, (s for s, _, _ in data)))
