@@ -32,7 +32,7 @@ tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
 tf.flags.DEFINE_string("model_dir", "model/",
                        "Directory containing memn2n model checkpoints")
-tf.flags.DEFINE_boolean('train', True, 'if True, begin to train')
+tf.flags.DEFINE_boolean('train', False, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
@@ -161,7 +161,7 @@ class chatBot(object):
             self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
         valS, valQ, valA, valTag = vectorize_data(
             self.valData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
-        self.train_data=[trainS, trainQ, trainA,trainTag]
+
         n_train = len(trainS)
         n_val = len(valS)
         print("Training Size", n_train)
@@ -211,6 +211,10 @@ class chatBot(object):
                                     'model.ckpt', global_step=t)
 
     def test(self,introspect=False):
+        trainS, trainQ, trainA, trainTag = vectorize_data(
+            self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
+        self.train_data = [trainS, trainQ, trainA, trainTag]
+
         ckpt = tf.train.get_checkpoint_state(self.model_dir)
         if ckpt and ckpt.model_checkpoint_path:
             self.saver.restore(self.sess, ckpt.model_checkpoint_path)
