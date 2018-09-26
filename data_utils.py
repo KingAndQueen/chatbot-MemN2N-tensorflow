@@ -5,6 +5,8 @@ import re
 import numpy as np
 import tensorflow as tf
 import pdb
+import nltk
+
 stop_words=set(["a","an","the"])
 
 
@@ -184,6 +186,7 @@ def vectorize_data(data, word_idx, sentence_size, batch_size, candidates_size, m
     S = []
     Q = []
     A = []
+    tags_data = []
     data.sort(key=lambda x:len(x[0]),reverse=True)
     for i, (story, query, answer) in enumerate(data):
         if i%batch_size==0:
@@ -207,4 +210,15 @@ def vectorize_data(data, word_idx, sentence_size, batch_size, candidates_size, m
         S.append(np.array(ss))
         Q.append(np.array(q))
         A.append(np.array(answer))
-    return S, Q, A
+
+        tags = []
+        for sent in story:
+            tag_list = []
+            tag_sents = nltk.pos_tag(sent)
+            for tag in tag_sents:
+                tag_list.append(tag[1])
+            # if tag_list not in tags:
+            tags.append(tag_list)
+        tags_data.append(tags[-min(max_memory_size,len(story)):])
+    # pdb.set_trace()
+    return S, Q, A,tags_data

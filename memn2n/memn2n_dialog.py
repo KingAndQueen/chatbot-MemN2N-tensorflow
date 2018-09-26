@@ -5,7 +5,8 @@ import tensorflow as tf
 import numpy as np
 from six.moves import range
 from datetime import datetime
-
+import copy
+import pdb
 
 def zero_nil_slot(t, name=None):
     """
@@ -36,6 +37,39 @@ def add_gradient_noise(t, stddev=1e-3, name=None):
         t = tf.convert_to_tensor(t, name="t")
         gn = tf.random_normal(tf.shape(t), stddev=stddev)
         return tf.add(t, gn, name=name)
+
+def find_lcseque(s1, s2):
+    m = [[0 for x in range(len(s2) + 1)] for y in range(len(s1) + 1)]
+
+    d = [[None for x in range(len(s2) + 1)] for y in range(len(s1) + 1)]
+
+    for p1 in range(len(s1)):
+        for p2 in range(len(s2)):
+            if s1[p1] == s2[p2]:
+                m[p1 + 1][p2 + 1] = m[p1][p2] + 1
+                d[p1 + 1][p2 + 1] = 'ok'
+            elif m[p1 + 1][p2] > m[p1][p2 + 1]:
+                m[p1 + 1][p2 + 1] = m[p1 + 1][p2]
+                d[p1 + 1][p2 + 1] = 'left'
+            else:
+                m[p1 + 1][p2 + 1] = m[p1][p2 + 1]
+                d[p1 + 1][p2 + 1] = 'up'
+    (p1, p2) = (len(s1), len(s2))
+    # pdb.set_trace()
+    # print (np.array(d))
+    s = []
+    while m[p1][p2]:
+        c = d[p1][p2]
+        if c == 'ok':
+            s.append(s1[p1 - 1])
+            p1 -= 1
+            p2 -= 1
+        if c == 'left':
+            p2 -= 1
+        if c == 'up':
+            p1 -= 1
+    s.reverse()
+    return s
 
 
 class MemN2NDialog(object):
@@ -238,3 +272,145 @@ class MemN2NDialog(object):
         """
         feed_dict = {self._stories: stories, self._queries: queries}
         return self._sess.run(self.predict_op, feed_dict=feed_dict)
+
+
+    def simulate_query(self, test_stories, test_queries, test_tags, train_data, word_idx, train_word_set):
+        # pdb.set_trace()
+        s = train_data[0]
+        q = train_data[1]
+        a = train_data[2]
+        tags_train = train_data[3]
+        tags_test = test_tags
+        # pdb.set_trace()
+        name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set)
+        # pdb.set_trace()
+        name_map = {}
+        for test_entity, train_entities in name_map_.items():
+            for train_entity in train_entities:
+                if train_entity not in name_map.values():
+                    name_map[test_entity] = train_entity
+                    break
+        # pdb.set_trace()
+        # if not len(name_map) == len(name_map_): pdb.set_trace()
+        name_map = {value: key for key, value in name_map.items()}
+        # pdb.set_trace()
+
+        # print('new name_map:', name_map)
+        # for query in test_queries:
+        #     a_list=test_entities
+        #     b_list=query
+        #     cross=list((set(a_list).union(set(b_list))) ^ (set(a_list) ^ set(b_list)))
+        #     if len(cross)>0:
+        # pdb.set_trace()
+        # print('simulate querying...')
+
+        # losses = 0
+        for s_e in range(100):
+            losses = self.simulate_train(name_map, s, q, a, 0.01)
+            print('The %d th simulation loss:%f' % (s_e, losses))
+
+    def entities_map(self, tags_test, tags_train, train_stories, test_stories, train_set):
+        name_map = {}
+        # samples=[]
+        def similar_sample(tags_test_sent_, tags_train_, position):
+            similar_sample_index = []
+            longest_len = 0
+            for idx_story, tags_story in enumerate(tags_train_):
+                for idx_sent, tags_sents in enumerate(tags_story):
+                    length = len(find_lcseque(tags_test_sent_, tags_sents))
+                    if length>longest_len and len(tags_sents) > position:
+                        longest_len = length
+                        similar_sample_index=[]
+                        similar_sample_index.append([idx_story, idx_sent])
+                    if length == longest_len and len(tags_sents) > position:
+                        similar_sample_index.append([idx_story, idx_sent])
+
+            return similar_sample_index
+
+        def new_words_position(sent, train_set):
+            new_words_p = []
+            new_word = []
+            # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
+            for idx, word in enumerate(sent):
+                if word not in train_set and not word == 0:
+                    new_words_p.append(idx)
+                    new_word.append(word)
+            return new_words_p, new_word
+
+        for idx_story, story in enumerate(test_stories):
+            # print('test number:', idx_story)
+            for idx_sents, sents in enumerate(story):
+                # pdb.set_trace()
+                recognise = False
+                position_list, new_words = new_words_position(sents[:-1], train_set)
+                for words in new_words:
+                    if words not in name_map.keys():
+                        recognise = True
+                # print (recognise,new_words,name_map)
+                if len(position_list) > 0 and recognise:
+                    for position in position_list:
+                        similar_smaple_in_train_positions = similar_sample(tags_test[idx_story][idx_sents], tags_train, position)
+                        # pdb.set_trace()
+                        for train_position in similar_smaple_in_train_positions:
+                          try:
+                            if tags_train[train_position[0]][train_position[1]][position] == \
+                                    tags_test[idx_story][idx_sents][position]:
+                                # pdb.set_trace()
+                                value = train_stories[train_position[0]][train_position[1]][position]
+                                if sents[position] not in name_map.keys():
+                                    name_map[sents[position]] = [value]
+                                elif value not in name_map[sents[position]]:
+                                    name_map[sents[position]].append(value)
+                          except:
+                                pdb.set_trace()
+
+        return name_map
+
+    def simulate_train(self, name_map, story, query, answer, lr):
+        stories, queries, answers = [], [], []
+        # for key,value in name_map.items():
+        #     name_map_temp={value:key}
+        flag = False
+        for i in range(len(query)):
+            s = copy.copy(story[i])
+            q = copy.copy(query[i])
+            a = copy.copy(answer[i])
+            for no, id in enumerate(q):
+                if id in name_map.keys():
+                    q[no] = name_map[id]
+                    flag = True
+            for _no, sent in enumerate(s):
+                for no_, id in enumerate(sent):
+                    if id in name_map.keys():
+                        sent[no_] = name_map[id]
+                        flag = True
+            # pdb.set_trace()
+
+            ans_id = np.argmax(a, 0)
+            if ans_id in name_map.keys():
+                a = np.zeros(len(a))
+                a[name_map[ans_id]] = 1
+                flag = True
+            # pdb.set_trace()
+            if flag:
+                stories.append(s)
+                queries.append(q)
+                answers.append(a)
+                flag = False
+
+        if len(queries) <= 0: pdb.set_trace()
+        total_cost = 0.0
+        if len(queries) > 32:
+            batches = zip(range(0, len(queries) - 32, 32), range(32, len(queries), 32))
+            batches = [(start, end) for start, end in batches]
+            np.random.shuffle(batches)
+            # pdb.set_trace()
+            for start, end in batches:
+                s = stories[start:end]
+                q = queries[start:end]
+                a = answers[start:end]
+                cost_t = self.batch_fit(s, q, a)
+                total_cost += cost_t
+        else:
+            total_cost = self.batch_fit(stories, queries, answers)
+        return total_cost
