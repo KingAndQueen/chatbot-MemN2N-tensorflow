@@ -305,8 +305,8 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(50):
-            losses = self.simulate_train(name_map, s, q, a, 0.01)
+        for s_e in range(100):
+            losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
     def entities_map(self, tags_test, tags_train, train_stories, test_stories, train_set):
@@ -366,7 +366,7 @@ class MemN2NDialog(object):
 
         return name_map
 
-    def simulate_train(self, name_map, story, query, answer, lr):
+    def simulate_train(self, name_map, story, query, answer):
         stories, queries, answers = [], [], []
         # for key,value in name_map.items():
         #     name_map_temp={value:key}
