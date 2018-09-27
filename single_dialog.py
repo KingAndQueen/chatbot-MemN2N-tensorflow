@@ -211,6 +211,7 @@ class chatBot(object):
                                     'model.ckpt', global_step=t)
 
     def test(self,introspect=False):
+        print('begin test...')
         trainS, trainQ, trainA, trainTag = vectorize_data(
             self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
         self.train_data = [trainS, trainQ, trainA, trainTag]

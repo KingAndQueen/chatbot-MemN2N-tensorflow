@@ -287,7 +287,7 @@ class MemN2NDialog(object):
         name_map = {}
         for test_entity, train_entities in name_map_.items():
             for train_entity in train_entities:
-                if train_entity not in name_map.values():
+                if train_entity not in name_map.values() and test_entity!=train_entity:
                     name_map[test_entity] = train_entity
                     break
         # pdb.set_trace()
@@ -305,7 +305,7 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(100):
+        for s_e in range(50):
             losses = self.simulate_train(name_map, s, q, a, 0.01)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
