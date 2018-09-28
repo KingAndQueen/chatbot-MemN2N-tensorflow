@@ -294,7 +294,7 @@ class MemN2NDialog(object):
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         # pdb.set_trace()
-        idx_word={value:key for key,value in word_idx.items()}
+        # idx_word={value:key for key,value in word_idx.items()}
 
         # print('new name_map:', name_map)
         # for query in test_queries:
@@ -388,16 +388,15 @@ class MemN2NDialog(object):
                         flag = True
             # pdb.set_trace()
 
-            ans_id = np.argmax(a, 0)
-            if ans_id in name_map.keys():
-                a = np.zeros(len(a))
-                a[name_map[ans_id]] = 1
+            a_new =a
+            if a in name_map.keys():
+                a_new=name_map[a]
                 flag = True
             # pdb.set_trace()
             if flag:
                 stories.append(s)
                 queries.append(q)
-                answers.append(a)
+                answers.append(a_new)
                 flag = False
 
         if len(queries) <= 0: pdb.set_trace()
@@ -411,6 +410,7 @@ class MemN2NDialog(object):
                 s = stories[start:end]
                 q = queries[start:end]
                 a = answers[start:end]
+                pdb.set_trace()
                 cost_t = self.batch_fit(s, q, a)
                 total_cost += cost_t
         else:
