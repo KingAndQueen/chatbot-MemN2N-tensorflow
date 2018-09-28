@@ -410,7 +410,7 @@ class MemN2NDialog(object):
                 s = stories[start:end]
                 q = queries[start:end]
                 a = answers[start:end]
-                pdb.set_trace()
+                # pdb.set_trace()
                 cost_t = self.batch_fit(s, q, a)
                 total_cost += cost_t
         else:
