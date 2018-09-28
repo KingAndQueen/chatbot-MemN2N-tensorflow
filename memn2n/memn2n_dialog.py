@@ -256,8 +256,15 @@ class MemN2NDialog(object):
         """
         feed_dict = {self._stories: stories,
                      self._queries: queries, self._answers: answers}
-        loss, _ = self._sess.run(
-            [self.loss_op, self.train_op], feed_dict=feed_dict)
+        # pdb.set_trace()
+        # try:
+        loss, _ = self._sess.run([self.loss_op, self.train_op], feed_dict=feed_dict)
+        # except:
+        #     for id,story in enumerate(stories):
+        #         print (id,':',len(story))
+        #     for id, story in enumerate(queries):
+        #         print (id, ':', len(story))
+        #     pdb.set_trace()
         return loss
 
     def predict(self, stories, queries):
@@ -396,13 +403,14 @@ class MemN2NDialog(object):
             if flag:
                 stories.append(s)
                 queries.append(q)
-                answers.append(a_new)
+                answers.append(np.array(a_new))
                 flag = False
 
         if len(queries) <= 0: pdb.set_trace()
         total_cost = 0.0
+        print('simulate samples number:', len(stories))
         if len(queries) > 32:
-            batches = zip(range(0, len(queries) - 32, 32), range(32, len(queries), 32))
+            batches = zip(range(0, len(queries) - self._batch_size, self._batch_size), range(self._batch_size, len(queries), self._batch_size))
             batches = [(start, end) for start, end in batches]
             np.random.shuffle(batches)
             # pdb.set_trace()
