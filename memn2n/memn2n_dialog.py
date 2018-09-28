@@ -313,7 +313,7 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(100):
+        for s_e in range(200):
             losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
@@ -408,7 +408,7 @@ class MemN2NDialog(object):
 
         if len(queries) <= 0: pdb.set_trace()
         total_cost = 0.0
-        print('simulate samples number:', len(stories))
+        # print('simulate samples number:', len(stories))
         if len(queries) > 32:
             batches = zip(range(0, len(queries) - self._batch_size, self._batch_size), range(self._batch_size, len(queries), self._batch_size))
             batches = [(start, end) for start, end in batches]
