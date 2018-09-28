@@ -72,13 +72,14 @@ class chatBot(object):
             self.data_dir, self.task_id, self.candid2indx, self.OOV)
         data = self.trainData + self.testData + self.valData
 
+        self.build_vocab(data, candidates)
+        #build training words set
         self.train_val_wordset = self.words_set(self.trainData + self.valData)
         test_wordset = self.words_set(self.testData)
         no_oov_word = len(self.train_val_wordset)
         with_oov_word = len(test_wordset)
         print('oov words', with_oov_word - no_oov_word)
 
-        self.build_vocab(data, candidates)
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
             candidates, self.word_idx, self.candidate_sentence_size)
@@ -96,7 +97,7 @@ class chatBot(object):
 
     def words_set(self, data):
         train_set = sorted(reduce(lambda x, y: x | y, (set(list(chain.from_iterable(s)) + q) for s, q, a in data)))
-
+        train_set = [self.word_idx[id] for id in train_set]
         return train_set
 
     def build_vocab(self, data, candidates):

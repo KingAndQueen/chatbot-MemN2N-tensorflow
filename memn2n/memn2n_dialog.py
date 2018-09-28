@@ -294,6 +294,7 @@ class MemN2NDialog(object):
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         # pdb.set_trace()
+        idx_word={value:key for key,value in word_idx.items()}
 
         # print('new name_map:', name_map)
         # for query in test_queries:
@@ -343,6 +344,7 @@ class MemN2NDialog(object):
                 # pdb.set_trace()
                 recognise = False
                 position_list, new_words = new_words_position(sents[:-1], train_set)
+
                 for words in new_words:
                     if words not in name_map.keys():
                         recognise = True
