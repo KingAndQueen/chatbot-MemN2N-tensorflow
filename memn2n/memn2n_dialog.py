@@ -388,9 +388,9 @@ class MemN2NDialog(object):
                         flag = True
             # pdb.set_trace()
 
-            a_new =a
-            if a in name_map.keys():
-                a_new=name_map[a]
+            a_new =int(a)
+            if a_new in name_map.keys():
+                a_new=name_map[a_new]
                 flag = True
             # pdb.set_trace()
             if flag:
