@@ -302,7 +302,9 @@ class MemN2NDialog(object):
         name_map = {value: key for key, value in name_map.items()}
         # pdb.set_trace()
         # idx_word={value:key for key,value in word_idx.items()}
-
+        # for key,value in name_map.items():
+        #     print(idx_word[key],idx_word[value],'\n')
+        # pdb.set_trace()
         # print('new name_map:', name_map)
         # for query in test_queries:
         #     a_list=test_entities
@@ -313,7 +315,7 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(200):
+        for s_e in range(50):
             losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
@@ -409,7 +411,7 @@ class MemN2NDialog(object):
         if len(queries) <= 0: pdb.set_trace()
         total_cost = 0.0
         # print('simulate samples number:', len(stories))
-        if len(queries) > 32:
+        if len(queries) > self._batch_size:
             batches = zip(range(0, len(queries) - self._batch_size, self._batch_size), range(self._batch_size, len(queries), self._batch_size))
             batches = [(start, end) for start, end in batches]
             np.random.shuffle(batches)
