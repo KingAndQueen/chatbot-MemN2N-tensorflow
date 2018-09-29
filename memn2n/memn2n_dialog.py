@@ -315,7 +315,7 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(50):
+        for s_e in range(20):
             losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
