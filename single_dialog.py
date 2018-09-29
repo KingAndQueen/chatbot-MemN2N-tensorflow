@@ -91,7 +91,7 @@ class chatBot(object):
                                   self.embedding_size, self.candidates_vec, session=self.sess,
                                   hops=self.hops, max_grad_norm=self.max_grad_norm, optimizer=optimizer,
                                   task_id=task_id)
-        self.saver = tf.train.Saver(max_to_keep=50)
+        self.saver = tf.train.Saver(max_to_keep=1)
 
         self.summary_writer = tf.summary.FileWriter(
             self.model.root_dir, self.model.graph_output.graph)
