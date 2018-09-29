@@ -170,7 +170,7 @@ def vectorize_candidates(candidates,word_idx,sentence_size):
     for i,candidate in enumerate(candidates):
         lc=max(0,sentence_size-len(candidate))
         C.append([word_idx[w] if w in word_idx else 0 for w in candidate] + [0] * lc)
-    pdb.set_trace()
+    # pdb.set_trace()
     return tf.constant(C,shape=shape)
 
 
