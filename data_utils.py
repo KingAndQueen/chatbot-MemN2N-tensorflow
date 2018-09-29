@@ -45,6 +45,7 @@ def load_dialog_task(data_dir, task_id, candid_dic, isOOV):
         test_file = [f for f in files if s in f and 'tst.' in f][0]
     val_file = [f for f in files if s in f and 'dev' in f][0]
     train_data = get_dialogs(train_file,candid_dic)
+    # pdb.set_trace()
     test_data = get_dialogs(test_file,candid_dic)
     val_data = get_dialogs(val_file,candid_dic)
     return train_data, test_data, val_data
@@ -188,10 +189,10 @@ def vectorize_data(data, word_idx, sentence_size, batch_size, candidates_size, m
     A = []
     tags_data = []
     data.sort(key=lambda x:len(x[0]),reverse=True)
-    memory_size=max_memory_size
+    # memory_size=max_memory_size
     for i, (story, query, answer) in enumerate(data):
-        # if i%batch_size==0:
-        #     memory_size=max(1,min(max_memory_size,len(story)))
+        if i%batch_size==0:
+            memory_size=max(1,min(max_memory_size,len(story)))
         ss = []
         for i, sentence in enumerate(story, 1):
             ls = max(0, sentence_size - len(sentence))

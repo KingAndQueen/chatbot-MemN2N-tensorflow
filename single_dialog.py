@@ -74,12 +74,13 @@ class chatBot(object):
 
         self.build_vocab(data, candidates)
         #build training words set
-        self.train_val_wordset = self.words_set(self.trainData + self.valData)
-        test_wordset = self.words_set(self.testData)
+        # pdb.set_trace()
+        self.train_val_wordset = self.words_set(self.valData+self.trainData)
+        all_wordset = self.words_set(data)
         no_oov_word = len(self.train_val_wordset)
-        with_oov_word = len(test_wordset)
+        with_oov_word = len(all_wordset)
         print('oov words', with_oov_word - no_oov_word)
-
+        # pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
             candidates, self.word_idx, self.candidate_sentence_size)
@@ -236,6 +237,7 @@ class chatBot(object):
     def batch_predict(self, S, Q, n,testTag=None,introspect=False):
 
         if introspect:
+            print('introspection...')
             self.model.simulate_query(S, Q, testTag, self.train_data, self.word_idx, self.train_val_wordset)
         preds = []
         for start in range(0, n, self.batch_size):
