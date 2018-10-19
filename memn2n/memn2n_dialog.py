@@ -340,23 +340,23 @@ class MemN2NDialog(object):
 
         def new_words_position(sent, train_set):
             new_words_p = []
-            new_word = set()
+            new_word = []
             # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
             for idx, word in enumerate(sent):
-                if word not in train_set and not word == 0:
+                pdb.set_trace()
+                if word not in train_set and not word == 0 and '_' not in word:
                     new_words_p.append(idx)
-                    new_word.add(word)
+                    new_word.append(word)
             return new_words_p, new_word
 
         for idx_story, story in enumerate(test_stories):
             # print('test number:', idx_story)
             for idx_sents, sents in enumerate(story):
-                # pdb.set_trace()
+                pdb.set_trace()
                 recognise = False
                 position_list, new_words = new_words_position(sents[:-1], train_set)
 
                 for words in new_words:
-                    print('A new word for me:',idx_word[words])
                     if words not in name_map.keys():
                         recognise = True
                 # print (recognise,new_words,name_map)

@@ -26,7 +26,7 @@ tf.flags.DEFINE_integer("epochs", 200, "Number of epochs to train for.")
 tf.flags.DEFINE_integer("embedding_size", 20,
                         "Embedding size for embedding matrices.")
 tf.flags.DEFINE_integer("memory_size", 50, "Maximum size of memory.")
-tf.flags.DEFINE_integer("task_id", 3, "bAbI task id, 1 <= id <= 6")
+tf.flags.DEFINE_integer("task_id",5 , "bAbI task id, 1 <= id <= 6")
 tf.flags.DEFINE_integer("random_state", None, "Random state.")
 tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
@@ -80,6 +80,11 @@ class chatBot(object):
         no_oov_word = len(self.train_val_wordset)
         with_oov_word = len(all_wordset)
         print('oov words', with_oov_word - no_oov_word)
+        new_words=[]
+        for word in all_wordset:
+            if word not in self.train_val_wordset:
+                new_words.append(self.idx_word[word])
+        print('These words are new:',new_words)
         # pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
