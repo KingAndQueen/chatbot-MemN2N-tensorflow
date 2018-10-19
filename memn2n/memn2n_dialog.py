@@ -343,7 +343,7 @@ class MemN2NDialog(object):
             new_word = []
             # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
             for idx, word in enumerate(sent):
-                pdb.set_trace()
+                # pdb.set_trace()
                 if word not in train_set and not word == 0 and '_' not in idx_word[word]:
                     new_words_p.append(idx)
                     new_word.append(word)
