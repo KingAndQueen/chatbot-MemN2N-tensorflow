@@ -340,12 +340,12 @@ class MemN2NDialog(object):
 
         def new_words_position(sent, train_set):
             new_words_p = []
-            new_word = []
+            new_word = set()
             # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
             for idx, word in enumerate(sent):
                 if word not in train_set and not word == 0:
                     new_words_p.append(idx)
-                    new_word.append(word)
+                    new_word.add(word)
             return new_words_p, new_word
 
         for idx_story, story in enumerate(test_stories):
