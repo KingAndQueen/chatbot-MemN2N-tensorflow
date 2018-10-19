@@ -344,7 +344,7 @@ class MemN2NDialog(object):
             # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
             for idx, word in enumerate(sent):
                 pdb.set_trace()
-                if word not in train_set and not word == 0 and '_' not in word:
+                if word not in train_set and not word == 0 and '_' not in idx_word[word]:
                     new_words_p.append(idx)
                     new_word.append(word)
             return new_words_p, new_word
@@ -352,7 +352,7 @@ class MemN2NDialog(object):
         for idx_story, story in enumerate(test_stories):
             # print('test number:', idx_story)
             for idx_sents, sents in enumerate(story):
-                pdb.set_trace()
+                # pdb.set_trace()
                 recognise = False
                 position_list, new_words = new_words_position(sents[:-1], train_set)
 
