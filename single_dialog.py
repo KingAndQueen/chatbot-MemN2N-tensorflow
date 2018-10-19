@@ -26,7 +26,7 @@ tf.flags.DEFINE_integer("epochs", 200, "Number of epochs to train for.")
 tf.flags.DEFINE_integer("embedding_size", 20,
                         "Embedding size for embedding matrices.")
 tf.flags.DEFINE_integer("memory_size", 50, "Maximum size of memory.")
-tf.flags.DEFINE_integer("task_id", 1, "bAbI task id, 1 <= id <= 6")
+tf.flags.DEFINE_integer("task_id", 3, "bAbI task id, 1 <= id <= 6")
 tf.flags.DEFINE_integer("random_state", None, "Random state.")
 tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
@@ -80,7 +80,7 @@ class chatBot(object):
         no_oov_word = len(self.train_val_wordset)
         with_oov_word = len(all_wordset)
         print('oov words', with_oov_word - no_oov_word)
-        pdb.set_trace()
+        # pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
             candidates, self.word_idx, self.candidate_sentence_size)
@@ -110,6 +110,7 @@ class chatBot(object):
         # pdb.set_trace()
         vocab = sorted(vocab)
         self.word_idx = dict((c, i + 1) for i, c in enumerate(vocab))
+        self.idx_word={value:key for key,value in self.word_idx.items()}
         max_story_size = max(map(len, (s for s, _, _ in data)))
         mean_story_size = int(np.mean([len(s) for s, _, _ in data]))
         self.sentence_size = max(
@@ -238,7 +239,7 @@ class chatBot(object):
 
         if introspect:
             print('introspection...')
-            self.model.simulate_query(S, Q, testTag, self.train_data, self.word_idx, self.train_val_wordset)
+            self.model.simulate_query(S, Q, testTag, self.train_data, self.word_idx, self.train_val_wordset,self.idx_word)
         preds = []
         for start in range(0, n, self.batch_size):
             end = start + self.batch_size

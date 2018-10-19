@@ -282,7 +282,7 @@ class MemN2NDialog(object):
         return self._sess.run(self.predict_op, feed_dict=feed_dict)
 
 
-    def simulate_query(self, test_stories, test_queries, test_tags, train_data, word_idx, train_word_set):
+    def simulate_query(self, test_stories, test_queries, test_tags, train_data, word_idx, train_word_set,idx_word):
         # pdb.set_trace()
         s = train_data[0]
         q = train_data[1]
@@ -290,7 +290,7 @@ class MemN2NDialog(object):
         tags_train = train_data[3]
         tags_test = test_tags
         # pdb.set_trace()
-        name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set)
+        name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set,idx_word)
         # pdb.set_trace()
         name_map = {}
         for test_entity, train_entities in name_map_.items():
@@ -320,7 +320,7 @@ class MemN2NDialog(object):
             losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
-    def entities_map(self, tags_test, tags_train, train_stories, test_stories, train_set):
+    def entities_map(self, tags_test, tags_train, train_stories, test_stories, train_set,idx_word):
         name_map = {}
         # samples=[]
         def similar_sample(tags_test_sent_, tags_train_, position):
@@ -356,6 +356,7 @@ class MemN2NDialog(object):
                 position_list, new_words = new_words_position(sents[:-1], train_set)
 
                 for words in new_words:
+                    print('A new word for me:',idx_word[words])
                     if words not in name_map.keys():
                         recognise = True
                 # print (recognise,new_words,name_map)
