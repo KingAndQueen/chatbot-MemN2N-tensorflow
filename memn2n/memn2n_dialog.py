@@ -338,7 +338,7 @@ class MemN2NDialog(object):
 
             return similar_sample_index
 
-        def new_words_position(sent, train_set):
+        def new_words_position(sent, train_set,idx_word):
             new_words_p = []
             new_word = []
             # token = [x.strip() for x in re.split('(\W+)?', sent) if x.strip()]
@@ -354,7 +354,7 @@ class MemN2NDialog(object):
             for idx_sents, sents in enumerate(story):
                 # pdb.set_trace()
                 recognise = False
-                position_list, new_words = new_words_position(sents[:-1], train_set)
+                position_list, new_words = new_words_position(sents[:-1], train_set,idx_word)
 
                 for words in new_words:
                     if words not in name_map.keys():
