@@ -236,9 +236,10 @@ class MemN2NDialog(object):
                     u_k = self._nonlin(u_k)
 
                 u.append(u_k)
-            candidates_emb = tf.nn.embedding_lookup(self.W, self._candidates)
-            candidates_emb_sum = tf.reduce_sum(candidates_emb, 1)
-            return tf.matmul(u_k, tf.transpose(candidates_emb_sum))
+            candidates_emb = tf.nn.embedding_lookup(self.W, self._candidates) #candidates.shape=[4212,9]
+            candidates_emb_sum = tf.reduce_sum(candidates_emb, 1)#candidates_emb.shape=[4212,9,20]
+            # pdb.set_trace()
+            return tf.matmul(u_k, tf.transpose(candidates_emb_sum))#candidates_emb_sum.shape=[4212,20]
             # logits=tf.matmul(u_k, self.W)
             # return
             # tf.transpose(tf.sparse_tensor_dense_matmul(self._candidates,tf.transpose(logits)))

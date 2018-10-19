@@ -80,7 +80,7 @@ class chatBot(object):
         no_oov_word = len(self.train_val_wordset)
         with_oov_word = len(all_wordset)
         print('oov words', with_oov_word - no_oov_word)
-        # pdb.set_trace()
+        pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
             candidates, self.word_idx, self.candidate_sentence_size)
