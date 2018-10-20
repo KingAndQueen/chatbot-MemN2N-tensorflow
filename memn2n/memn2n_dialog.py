@@ -291,13 +291,23 @@ class MemN2NDialog(object):
         tags_test = test_tags
         # pdb.set_trace()
         name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set,idx_word)
-        # pdb.set_trace()
+        pdb.set_trace()
         name_map = {}
+        count_map={}
+
         for test_entity, train_entities in name_map_.items():
             for train_entity in train_entities:
-                if train_entity not in name_map.values() and test_entity!=train_entity:
-                    name_map[test_entity] = train_entity
-                    break
+                if train_entity in count_map.keys():
+                    count_map[train_entity]+=1
+                else:
+                    count_map[train_entity]=1
+
+            vot_result=sorted(count_map,key=lambda x:count_map[x])[-1]
+            if vot_result not in name_map.values() and test_entity!=vot_result:
+                name_map[test_entity] = vot_result
+            else:
+                count_map.pop(vot_result)
+                name_map[test_entity]=sorted(count_map,key=lambda x:count_map[x])[-1]
         # pdb.set_trace()
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
@@ -356,14 +366,15 @@ class MemN2NDialog(object):
             # print('test number:', idx_story)
             for idx_sents, sents in enumerate(story):
                 # pdb.set_trace()
-                recognise = False
-                position_list, new_words = new_words_position(sents[:-1], train_set,idx_word)
-
-                for words in new_words:
+                position_list_, new_words_ = new_words_position(sents[:-1], train_set,idx_word)
+                # pdb.set_trace()
+                position_list,new_words=[],[]
+                for idx,words in enumerate(new_words_):
                     if words not in name_map.keys():
-                        recognise = True
+                        new_words.append(words)
+                        position_list.append(position_list_[idx])
                 # print (recognise,new_words,name_map)
-                if len(position_list) > 0 and recognise:
+                if len(position_list) > 0:
                     for position in position_list:
                         similar_smaple_in_train_positions = similar_sample(tags_test[idx_story][idx_sents], tags_train, position)
                         # pdb.set_trace()
