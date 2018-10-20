@@ -80,11 +80,11 @@ class chatBot(object):
         no_oov_word = len(self.train_val_wordset)
         with_oov_word = len(all_wordset)
         print('oov words', with_oov_word - no_oov_word)
-        new_words=[]
-        for word in all_wordset:
-            if word not in self.train_val_wordset:
-                new_words.append(self.idx_word[word])
-        print('These words are new:',new_words)
+        # new_words=[]
+        # for word in all_wordset:
+        #     if word not in self.train_val_wordset:
+        #         new_words.append(self.idx_word[word])
+        # print('These words are new:',new_words)
         # pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
         self.candidates_vec = vectorize_candidates(
