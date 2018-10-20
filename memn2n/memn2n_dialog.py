@@ -346,7 +346,7 @@ class MemN2NDialog(object):
                 if word not in train_set and not word == 0 and '_' not in idx_word[word]:
                     new_words_p.append(idx)
                     new_word.append(word)
-                pdb.set_trace()
+                # pdb.set_trace()
             return new_words_p, new_word
 
         for idx_story, story in enumerate(test_stories):
