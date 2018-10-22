@@ -291,7 +291,7 @@ class MemN2NDialog(object):
         tags_test = test_tags
         # pdb.set_trace()
         name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set,idx_word)
-        pdb.set_trace()
+        # pdb.set_trace()
         name_map = {}
         count_map={}
 
