@@ -388,6 +388,8 @@ class MemN2NDialog(object):
                                     tags_test[idx_story][idx_sents][position]:
                                 # pdb.set_trace()
                                 value = train_stories[train_position[0]][train_position[1]][position]
+                                if '_' in idx_word[value]:
+                                    break
                                 if sents[position] not in name_map.keys():
                                     name_map[sents[position]] = [value]
                                 elif value not in name_map[sents[position]]:
