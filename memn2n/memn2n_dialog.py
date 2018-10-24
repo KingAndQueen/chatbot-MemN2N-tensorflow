@@ -312,7 +312,6 @@ class MemN2NDialog(object):
                 else:
                     count_map.pop(vot_result)
 
-
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         print('vocab len:',len(name_map))
