@@ -293,9 +293,10 @@ class MemN2NDialog(object):
         name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set,idx_word)
         # pdb.set_trace()
         name_map = {}
-        count_map={}
+
 
         for test_entity, train_entities in name_map_.items():
+            count_map = {}
             for train_entity in train_entities:
                 if train_entity in count_map.keys():
                     count_map[train_entity]+=1
@@ -303,12 +304,13 @@ class MemN2NDialog(object):
                     count_map[train_entity]=1
 
             vot_result=sorted(count_map,key=lambda x:count_map[x])[-1]
+            # pdb.set_trace()
             if vot_result not in name_map.values() and test_entity!=vot_result:
                 name_map[test_entity] = vot_result
             else:
                 count_map.pop(vot_result)
                 name_map[test_entity]=sorted(count_map,key=lambda x:count_map[x])[-1]
-        # pdb.set_trace()
+        pdb.set_trace()
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         print('vocab len:',len(name_map))
@@ -348,7 +350,8 @@ class MemN2NDialog(object):
                         similar_sample_index.append([idx_story, idx_sent])
                     if length == longest_len and len(tags_sents) > position:
                         similar_sample_index.append([idx_story, idx_sent])
-
+                if len(similar_sample_index)>10:
+                    break
             return similar_sample_index
 
         def new_words_position(sent, train_set,idx_word):
