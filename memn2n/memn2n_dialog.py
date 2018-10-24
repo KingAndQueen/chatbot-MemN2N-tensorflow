@@ -303,16 +303,16 @@ class MemN2NDialog(object):
                 else:
                     count_map[train_entity]=1
 
-            vot_result=sorted(count_map,key=lambda x:count_map[x])[-1]
             # pdb.set_trace()
-            if vot_result not in name_map.values() and test_entity!=vot_result:
-                name_map[test_entity] = vot_result
-            else:
-                try:
-                  count_map.pop(vot_result)
-                  name_map[test_entity]=sorted(count_map,key=lambda x:count_map[x])[-1]
-                except:
-                  pdb.set_trace()
+            while len(count_map)>0:
+                vot_result = sorted(count_map, key=lambda x: count_map[x])[-1]
+                if vot_result not in name_map.values() and test_entity!=vot_result:
+                    name_map[test_entity] = vot_result
+                    break
+                else:
+                    count_map.pop(vot_result)
+
+
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         print('vocab len:',len(name_map))
