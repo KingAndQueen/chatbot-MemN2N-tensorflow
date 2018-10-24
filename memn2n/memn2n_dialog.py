@@ -293,7 +293,7 @@ class MemN2NDialog(object):
         name_map_ = self.entities_map(tags_test, tags_train, s, test_stories, train_word_set,idx_word)
         # pdb.set_trace()
         name_map = {}
-
+        print ('name_map_:',name_map_)
 
         for test_entity, train_entities in name_map_.items():
             count_map = {}
@@ -311,7 +311,7 @@ class MemN2NDialog(object):
                     break
                 else:
                     count_map.pop(vot_result)
-
+            print('last count_map:',count_map)
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         print('vocab len:',len(name_map))
