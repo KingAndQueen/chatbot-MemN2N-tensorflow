@@ -304,6 +304,7 @@ class MemN2NDialog(object):
                     count_map[train_entity]=1
 
             # pdb.set_trace()
+            print('last count_map:', count_map)
             while len(count_map)>0:
                 vot_result = sorted(count_map, key=lambda x: count_map[x])[-1]
                 if vot_result not in name_map.values() and test_entity!=vot_result:
@@ -311,7 +312,8 @@ class MemN2NDialog(object):
                     break
                 else:
                     count_map.pop(vot_result)
-            print('last count_map:',count_map)
+
+        # pdb.set_trace()
         # if not len(name_map) == len(name_map_): pdb.set_trace()
         name_map = {value: key for key, value in name_map.items()}
         print('vocab len:',len(name_map))
@@ -351,7 +353,7 @@ class MemN2NDialog(object):
                         similar_sample_index.append([idx_story, idx_sent])
                     if length == longest_len and len(tags_sents) > position:
                         similar_sample_index.append([idx_story, idx_sent])
-                if len(similar_sample_index)>10:
+                if len(similar_sample_index)>500:
                     break
             return similar_sample_index
 
@@ -388,7 +390,7 @@ class MemN2NDialog(object):
                                     tags_test[idx_story][idx_sents][position]:
                                 # pdb.set_trace()
                                 value = train_stories[train_position[0]][train_position[1]][position]
-                                if '_' in idx_word[value]:
+                                if '_' in idx_word[value] or '#' in idx_word[value]:
                                     break
                                 if sents[position] not in name_map.keys():
                                     name_map[sents[position]] = [value]
