@@ -368,9 +368,9 @@ class MemN2NDialog(object):
                 # pdb.set_trace()
             return new_words_p, new_word
 
-        for idx_story, story in enumerate(test_stories):
+        for idx_story, story_test in enumerate(test_stories):
             # print('test number:', idx_story)
-            for idx_sents, sents in enumerate(story):
+            for idx_sents, sents in enumerate(story_test):
                 # pdb.set_trace()
                 position_list_, new_words_ = new_words_position(sents[:-1], train_set,idx_word)
                 # pdb.set_trace()
@@ -383,21 +383,29 @@ class MemN2NDialog(object):
                 if len(position_list) > 0:
                     for position in position_list:
                         similar_smaple_in_train_positions = similar_sample(tags_test[idx_story][idx_sents], tags_train, position)
-                        pdb.set_trace()
+                        # pdb.set_trace()
                         for train_position in similar_smaple_in_train_positions:
                           try:
+
                             if tags_train[train_position[0]][train_position[1]][position] == \
                                     tags_test[idx_story][idx_sents][position]:
                                 # pdb.set_trace()
                                 value = train_stories[train_position[0]][train_position[1]][position]
-                                if '_' in idx_word[value] or '#' in idx_word[value]:
+
+                            else:
+                                test_pos=tags_test[idx_story][idx_sents][position]
+                                train_sents_pos=tags_train[train_position[0]][train_position[1]]
+                                if test_pos in train_sents_pos:
+                                    near_position=train_sents_pos.index(test_pos)
+                                    value=train_stories[train_position[0]][train_position[1]][near_position]
+                                else:
                                     continue
-                                if sents[position] not in name_map.keys():
-                                    name_map[sents[position]] = [value]
-                                elif value not in name_map[sents[position]]:
-                                    name_map[sents[position]].append(value)
-
-
+                            if '_' in idx_word[value] or '#' in idx_word[value]:
+                                continue
+                            if sents[position] not in name_map.keys():
+                                name_map[sents[position]] = [value]
+                            elif value not in name_map[sents[position]]:
+                                name_map[sents[position]].append(value)
                           except:
                                 pdb.set_trace()
 
