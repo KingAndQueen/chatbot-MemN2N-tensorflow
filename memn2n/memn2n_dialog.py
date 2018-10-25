@@ -383,7 +383,7 @@ class MemN2NDialog(object):
                 if len(position_list) > 0:
                     for position in position_list:
                         similar_smaple_in_train_positions = similar_sample(tags_test[idx_story][idx_sents], tags_train, position)
-                        # pdb.set_trace()
+                        pdb.set_trace()
                         for train_position in similar_smaple_in_train_positions:
                           try:
                             if tags_train[train_position[0]][train_position[1]][position] == \
@@ -391,11 +391,13 @@ class MemN2NDialog(object):
                                 # pdb.set_trace()
                                 value = train_stories[train_position[0]][train_position[1]][position]
                                 if '_' in idx_word[value] or '#' in idx_word[value]:
-                                    break
+                                    continue
                                 if sents[position] not in name_map.keys():
                                     name_map[sents[position]] = [value]
                                 elif value not in name_map[sents[position]]:
                                     name_map[sents[position]].append(value)
+
+
                           except:
                                 pdb.set_trace()
 
