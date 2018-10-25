@@ -294,10 +294,16 @@ class MemN2NDialog(object):
         # pdb.set_trace()
         name_map = {}
         print ('name_map_:',name_map_)
-
+        choice_count={}
         for test_entity, train_entities in name_map_.items():
+            choice_count[test_entity]=len(train_entities)
+        while len(choice_count)>0:
+            # pdb.set_trace()
+            test_entity=sorted(choice_count, key=lambda x: choice_count[x])[-1]
+            choice_count.pop(test_entity)
+        # for test_entity, in name_map_.keys():
             count_map = {}
-            for train_entity in train_entities:
+            for train_entity in name_map_[test_entity]:
                 if train_entity in count_map.keys():
                     count_map[train_entity]+=1
                 else:
