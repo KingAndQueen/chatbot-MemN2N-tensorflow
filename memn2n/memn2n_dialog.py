@@ -317,7 +317,7 @@ class MemN2NDialog(object):
             #     vot_result = sorted(count_map, key=lambda x: count_map[x])[-1]
                 random_result=random.sample(train_entities,1)
                 # if random_result not in name_map.values() and test_entity!=random_result:
-                name_map[test_entity] = random_result
+                name_map[test_entity] = random_result[0]
                 #     break
                 # else:
                 #     count_map.pop(vot_result)
