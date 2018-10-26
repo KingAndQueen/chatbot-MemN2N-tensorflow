@@ -84,7 +84,7 @@ class MemN2NDialog(object):
                  optimizer=tf.train.AdamOptimizer(learning_rate=1e-2),
                  session=tf.Session(),
                  name='MemN2N',
-                 task_id=1):
+                 task_id=1,introspection_times=None):
         """Creates an End-To-End Memory Network
 
         Args:
@@ -139,7 +139,7 @@ class MemN2NDialog(object):
 
         self._build_inputs()
         self._build_vars()
-
+        self._intro_times=introspection_times
         # define summary directory
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
         self.root_dir = "%s_%s_%s_%s/" % ('task',
@@ -340,7 +340,7 @@ class MemN2NDialog(object):
         # print('simulate querying...')
 
         # losses = 0
-        for s_e in range(20):
+        for s_e in range(self._intro_times):
             losses = self.simulate_train(name_map, s, q, a)
             print('The %d th simulation loss:%f' % (s_e, losses))
 
@@ -359,8 +359,8 @@ class MemN2NDialog(object):
                         similar_sample_index.append([idx_story, idx_sent])
                     if length == longest_len and len(tags_sents) > position:
                         similar_sample_index.append([idx_story, idx_sent])
-                if len(similar_sample_index)>500:
-                    break
+                # if len(similar_sample_index)>500:
+                #     break
             return similar_sample_index
 
         def new_words_position(sent, train_set,idx_word):
