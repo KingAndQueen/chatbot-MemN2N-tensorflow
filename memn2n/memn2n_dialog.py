@@ -325,8 +325,8 @@ class MemN2NDialog(object):
         # pdb.set_trace()
         # if not len(name_map) == len(name_map_): pdb.set_trace()
             name_map = {value: key for key, value in name_map.items()}
-            for key,value in name_map.items():
-                print (idx_word[key],idx_word[value])
+            # for key,value in name_map.items():
+            #     print (idx_word[key],idx_word[value])
         # pdb.set_trace()
         # idx_word={value:key for key,value in word_idx.items()}
         # for key,value in name_map.items():
