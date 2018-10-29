@@ -36,6 +36,7 @@ tf.flags.DEFINE_boolean('train', False, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
+tf.flags.DEFINE_integer("intro_times", 30, "times of introspect training.")
 FLAGS = tf.flags.FLAGS
 print("Started Task:", FLAGS.task_id)
 
@@ -43,7 +44,7 @@ print("Started Task:", FLAGS.task_id)
 class chatBot(object):
     def __init__(self, data_dir, model_dir, task_id, isInteractive=True, OOV=False, memory_size=50, random_state=None,
                  batch_size=32, learning_rate=0.001, epsilon=1e-8, max_grad_norm=40.0, evaluation_interval=10, hops=3,
-                 epochs=200, embedding_size=20):
+                 epochs=200, embedding_size=20,intro_times=20):
         self.data_dir = data_dir
         self.task_id = task_id
         self.model_dir = model_dir
@@ -60,6 +61,7 @@ class chatBot(object):
         self.hops = hops
         self.epochs = epochs
         self.embedding_size = embedding_size
+        self.intro_times=intro_times
 
         candidates, self.candid2indx = load_candidates(
             self.data_dir, self.task_id)
@@ -95,7 +97,7 @@ class chatBot(object):
         self.model = MemN2NDialog(self.batch_size, self.vocab_size, self.n_cand, self.sentence_size,
                                   self.embedding_size, self.candidates_vec, session=self.sess,
                                   hops=self.hops, max_grad_norm=self.max_grad_norm, optimizer=optimizer,
-                                  task_id=task_id,introspection_times=self.epochs/20)
+                                  task_id=task_id,introspection_times=self.intro_times)
         self.saver = tf.train.Saver(max_to_keep=1)
 
         self.summary_writer = tf.summary.FileWriter(
@@ -263,7 +265,7 @@ if __name__ == '__main__':
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     chatbot = chatBot(FLAGS.data_dir, model_dir, FLAGS.task_id, OOV=FLAGS.OOV,
-                      isInteractive=FLAGS.interactive, batch_size=FLAGS.batch_size,epochs=FLAGS.epochs)
+                      isInteractive=FLAGS.interactive, batch_size=FLAGS.batch_size,epochs=FLAGS.epochs,intro_times=FLAGS.intro_times)
     # chatbot.run()
     if FLAGS.train:
         chatbot.train()
