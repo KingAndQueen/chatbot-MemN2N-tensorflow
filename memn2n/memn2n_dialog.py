@@ -294,8 +294,10 @@ class MemN2NDialog(object):
         # pdb.set_trace()
         print('vocab len:', len(name_map_))
         print ('name_map_:',name_map_)
-        for key,value in name_map_.items():
-            print (idx_word[key],idx_word[value])
+        for key,values in name_map_.items():
+            print ('key:',idx_word[key],':')
+            for value in values:
+                print(idx_word[value])
 
         for s_e in range(self._intro_times):
             name_map = {}
