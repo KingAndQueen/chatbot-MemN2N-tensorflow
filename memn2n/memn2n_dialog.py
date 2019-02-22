@@ -10,6 +10,7 @@ import pdb
 import random
 def zero_nil_slot(t, name=None):
     """
+
     Overwrites the nil_slot (first row) of the input Tensor with zeros.
 
     The nil_slot is a dummy slot and should not be trained and influence
