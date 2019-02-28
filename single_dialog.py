@@ -23,7 +23,7 @@ tf.flags.DEFINE_integer("evaluation_interval", 10,
 tf.flags.DEFINE_integer("batch_size", 32, "Batch size for training.")
 tf.flags.DEFINE_integer("hops", 3, "Number of hops in the Memory Network.")
 tf.flags.DEFINE_integer("epochs", 200, "Number of epochs to train for.")
-tf.flags.DEFINE_integer("embedding_size", 20,
+tf.flags.DEFINE_integer("embedding_size", 25,
                         "Embedding size for embedding matrices.")
 tf.flags.DEFINE_integer("memory_size", 50, "Maximum size of memory.")
 tf.flags.DEFINE_integer("task_id",5 , "bAbI task id, 1 <= id <= 6")
