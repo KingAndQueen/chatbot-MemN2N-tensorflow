@@ -32,7 +32,7 @@ tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
 tf.flags.DEFINE_string("model_dir", "model/",
                        "Directory containing memn2n model checkpoints")
-tf.flags.DEFINE_boolean('train', False, 'if True, begin to train')
+tf.flags.DEFINE_boolean('train', True, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
