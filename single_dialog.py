@@ -8,7 +8,7 @@ from memn2n import MemN2NDialog
 from itertools import chain
 from six.moves import range, reduce
 
-import sys
+import pickle as pkl
 import tensorflow as tf
 import numpy as np
 import os
@@ -37,6 +37,7 @@ tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
 tf.flags.DEFINE_integer("intro_times", 30, "times of introspect training.")
+tf.flags.DEFINE_boolean('trained_emb', False, 'whether use trained embedding, such as Glove')
 FLAGS = tf.flags.FLAGS
 print("Started Task:", FLAGS.task_id)
 
@@ -89,6 +90,25 @@ class chatBot(object):
         # print('These words are new:',new_words)
         # pdb.set_trace()
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
+
+        if FLAGS.trained_emb:
+            import build_embedding
+            self.word_idx['<pad>'] = 0
+            data_path = FLAGS.data_dir + '/vocab.pkl'
+            f = open(data_path, 'wb')
+            pkl.dump(self.word_idx, f)
+            f.close()
+            glove_path = './glove.twitter.27B.25d.txt'
+            vocab_g, emb_g = build_embedding.loadGlove(glove_path, emb_size=25)
+            print('glove vocab_size', len(vocab_g))
+            print('glove embedding_dim', len(emb_g[0]))
+            # pdb.set_trace()
+            emb, word2idx = build_embedding.idx_to_emb('./my_data_replace/vocab.pkl', emb_size=25)
+            emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, './my_data_replace/new_embed.pkl')
+            my_embedding = pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
+        else:
+            my_embedding = None
+
         self.candidates_vec = vectorize_candidates(
             candidates, self.word_idx, self.candidate_sentence_size)
         optimizer = tf.train.AdamOptimizer(
@@ -97,11 +117,13 @@ class chatBot(object):
         self.model = MemN2NDialog(self.batch_size, self.vocab_size, self.n_cand, self.sentence_size,
                                   self.embedding_size, self.candidates_vec, session=self.sess,
                                   hops=self.hops, max_grad_norm=self.max_grad_norm, optimizer=optimizer,
-                                  task_id=task_id,introspection_times=self.intro_times)
+                                  task_id=task_id,introspection_times=self.intro_times,my_embedding=my_embedding)
         self.saver = tf.train.Saver(max_to_keep=1)
 
         self.summary_writer = tf.summary.FileWriter(
             self.model.root_dir, self.model.graph_output.graph)
+
+
 
     def words_set(self, data):
         train_set = sorted(reduce(lambda x, y: x | y, (set(list(chain.from_iterable(s)) + q) for s, q, a in data)))

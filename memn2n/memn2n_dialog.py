@@ -85,7 +85,7 @@ class MemN2NDialog(object):
                  optimizer=tf.train.AdamOptimizer(learning_rate=1e-2),
                  session=tf.Session(),
                  name='MemN2N',
-                 task_id=1,introspection_times=None):
+                 task_id=1,introspection_times=None,my_embedding=None):
         """Creates an End-To-End Memory Network
 
         Args:
@@ -138,6 +138,7 @@ class MemN2NDialog(object):
         self._name = name
         self._candidates = candidates_vec
 
+        self._my_embedding = my_embedding
         self._build_inputs()
         self._build_vars()
         self._intro_times=introspection_times
@@ -200,14 +201,26 @@ class MemN2NDialog(object):
     def _build_vars(self):
         with tf.variable_scope(self._name):
             nil_word_slot = tf.zeros([1, self._embedding_size])
-            A = tf.concat([nil_word_slot, self._init(
-                [self._vocab_size - 1, self._embedding_size])], 0)
-            self.A = tf.Variable(A, name="A")
-            self.H = tf.Variable(self._init(
-                [self._embedding_size, self._embedding_size]), name="H")
-            W = tf.concat([nil_word_slot, self._init(
-                [self._vocab_size - 1, self._embedding_size])], 0)
-            self.W = tf.Variable(W, name="W")
+
+            if self._my_embedding is not None:
+                initial=tf.constant_initializer(value=self._my_embedding,dtype=tf.float32)
+                trained_emb=tf.get_variable('embedding_word', shape=[self._vocab_size, self._embedding_size],
+                                initializer=initial, trainable=True)
+                A = tf.concat([nil_word_slot, trained_emb], 0)
+                self.A = tf.Variable(A, name="A")
+                self.H = tf.Variable(self._init(
+                    [self._embedding_size, self._embedding_size]), name="H")
+                W = tf.concat([nil_word_slot, trained_emb], 0)
+                self.W = tf.Variable(W, name="W")
+            else:
+                A = tf.concat([nil_word_slot, self._init(
+                    [self._vocab_size - 1, self._embedding_size])], 0)
+                self.A = tf.Variable(A, name="A")
+                self.H = tf.Variable(self._init(
+                    [self._embedding_size, self._embedding_size]), name="H")
+                W = tf.concat([nil_word_slot, self._init(
+                    [self._vocab_size - 1, self._embedding_size])], 0)
+                self.W = tf.Variable(W, name="W")
             # self.W = tf.Variable(self._init([self._vocab_size, self._embedding_size]), name="W")
         self._nil_vars = set([self.A.name, self.W.name])
 
