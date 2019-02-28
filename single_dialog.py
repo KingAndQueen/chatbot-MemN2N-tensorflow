@@ -37,7 +37,7 @@ tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
 tf.flags.DEFINE_integer("intro_times", 30, "times of introspect training.")
-tf.flags.DEFINE_boolean('trained_emb', False, 'whether use trained embedding, such as Glove')
+tf.flags.DEFINE_boolean('trained_emb', True, 'whether use trained embedding, such as Glove')
 FLAGS = tf.flags.FLAGS
 print("Started Task:", FLAGS.task_id)
 
