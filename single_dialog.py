@@ -103,9 +103,9 @@ class chatBot(object):
             print('glove vocab_size', len(vocab_g))
             print('glove embedding_dim', len(emb_g[0]))
             # pdb.set_trace()
-            emb, word2idx = build_embedding.idx_to_emb('./my_data_replace/vocab.pkl', emb_size=25)
-            emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, './my_data_replace/new_embed.pkl')
-            my_embedding = pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
+            emb, word2idx = build_embedding.idx_to_emb('./data/vocab.pkl', emb_size=25)
+            emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, './data/new_embed.pkl')
+            my_embedding = emb_new #pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
         else:
             my_embedding = None
 
