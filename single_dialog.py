@@ -90,7 +90,7 @@ class chatBot(object):
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
 
         if FLAGS.trained_emb:
-            if os.path.exists(FLAGS.data_dir + '/new_embed.pkl'):
+            if os.path.exists(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl'):
                 my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl', 'rb'))
             else:
                 import build_embedding
