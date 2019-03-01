@@ -43,26 +43,24 @@ print("Started Task:", FLAGS.task_id)
 
 
 class chatBot(object):
-    def __init__(self, data_dir, model_dir, task_id, isInteractive=True, OOV=False, memory_size=50, random_state=None,
-                 batch_size=32, learning_rate=0.001, epsilon=1e-8, max_grad_norm=40.0, evaluation_interval=10, hops=3,
-                 epochs=200, embedding_size=20,intro_times=20):
-        self.data_dir = data_dir
-        self.task_id = task_id
-        self.model_dir = model_dir
+    def __init__(self, FLAGS):
+        self.data_dir = FLAGS.data_dir
+        self.task_id = FLAGS.task_id
+        self.model_dir = FLAGS.model_dir
         # self.isTrain=isTrain
-        self.isInteractive = isInteractive
-        self.OOV = OOV
-        self.memory_size = memory_size
-        self.random_state = random_state
-        self.batch_size = batch_size
-        self.learning_rate = learning_rate
-        self.epsilon = epsilon
-        self.max_grad_norm = max_grad_norm
-        self.evaluation_interval = evaluation_interval
-        self.hops = hops
-        self.epochs = epochs
-        self.embedding_size = embedding_size
-        self.intro_times=intro_times
+        self.isInteractive = FLAGS.interactive
+        self.OOV = FLAGS.OOV
+        self.memory_size = FLAGS.memory_size
+        self.random_state = FLAGS.random_state
+        self.batch_size = FLAGS.batch_size
+        self.learning_rate = FLAGS.learning_rate
+        self.epsilon = FLAGS.epsilon
+        self.max_grad_norm = FLAGS.max_grad_norm
+        self.evaluation_interval = FLAGS.evaluation_interval
+        self.hops = FLAGS.hops
+        self.epochs = FLAGS.epochs
+        self.embedding_size = FLAGS.embedding_size
+        self.intro_times=FLAGS.intro_times
 
         candidates, self.candid2indx = load_candidates(
             self.data_dir, self.task_id)
@@ -289,8 +287,7 @@ if __name__ == '__main__':
     model_dir = "task" + str(FLAGS.task_id) + "_" + FLAGS.model_dir
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
-    chatbot = chatBot(FLAGS.data_dir, model_dir, FLAGS.task_id, OOV=FLAGS.OOV,
-                      isInteractive=FLAGS.interactive, batch_size=FLAGS.batch_size,epochs=FLAGS.epochs,intro_times=FLAGS.intro_times)
+    chatbot = chatBot(FLAGS, model_dir, OOV=FLAGS.OOV)
     # chatbot.run()
     if FLAGS.train:
         chatbot.train()
