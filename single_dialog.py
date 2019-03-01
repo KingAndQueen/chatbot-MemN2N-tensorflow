@@ -43,10 +43,10 @@ print("Started Task:", FLAGS.task_id)
 
 
 class chatBot(object):
-    def __init__(self, FLAGS):
+    def __init__(self, FLAGS,model_dir):
         self.data_dir = FLAGS.data_dir
         self.task_id = FLAGS.task_id
-        self.model_dir = FLAGS.model_dir
+        self.model_dir = model_dir
         # self.isTrain=isTrain
         self.isInteractive = FLAGS.interactive
         self.OOV = FLAGS.OOV
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     model_dir = "task" + str(FLAGS.task_id) + "_" + FLAGS.model_dir
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
-    chatbot = chatBot(FLAGS, model_dir, OOV=FLAGS.OOV)
+    chatbot = chatBot(FLAGS, model_dir)
     # chatbot.run()
     if FLAGS.train:
         chatbot.train()
