@@ -35,7 +35,7 @@ tf.flags.DEFINE_string("model_dir", "model/",
 tf.flags.DEFINE_boolean('train', True, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
-tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
+tf.flags.DEFINE_boolean('introspect', False, 'whether use the introspect unit')
 tf.flags.DEFINE_integer("intro_times", 30, "times of introspect training.")
 tf.flags.DEFINE_boolean('trained_emb', True, 'whether use trained embedding, such as Glove')
 FLAGS = tf.flags.FLAGS
@@ -91,7 +91,7 @@ class chatBot(object):
 
         if FLAGS.trained_emb:
             if os.path.exists(FLAGS.data_dir + '/new_embed.pkl'):
-                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
+                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed_'+FLAGS.task_id+'.pkl', 'rb'))
             else:
                 import build_embedding
                 # self.word_idx['<pad>'] = 0
@@ -105,7 +105,7 @@ class chatBot(object):
                 print('glove embedding_dim', len(emb_g[0]))
                 # pdb.set_trace()
                 emb, word2idx = build_embedding.idx_to_emb(FLAGS.data_dir+'/vocab.pkl', emb_size=25)
-                emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed.pkl')
+                emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed_'+FLAGS.task_id+'.pkl')
                 emb_new=emb_new[1:] #delete the first meaningless word
                 my_embedding = emb_new
         else:
