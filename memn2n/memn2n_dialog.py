@@ -204,6 +204,7 @@ class MemN2NDialog(object):
             nil_word_slot = np.zeros([1, self._embedding_size])
 
             if self._my_embedding is not None:
+
                 self._my_embedding = np.concatenate([nil_word_slot, self._my_embedding], axis=0)
                 initial=tf.constant_initializer(value=self._my_embedding,dtype=tf.float32)
                 pdb.set_trace()

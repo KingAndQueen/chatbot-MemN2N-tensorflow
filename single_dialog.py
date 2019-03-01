@@ -106,6 +106,7 @@ class chatBot(object):
                 # pdb.set_trace()
                 emb, word2idx = build_embedding.idx_to_emb(FLAGS.data_dir+'/vocab.pkl', emb_size=25)
                 emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed.pkl')
+                emb_new=emb_new[1:] #delete the first meaningless word
                 my_embedding = emb_new
         else:
             my_embedding = None
