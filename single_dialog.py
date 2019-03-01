@@ -26,7 +26,7 @@ tf.flags.DEFINE_integer("epochs", 200, "Number of epochs to train for.")
 tf.flags.DEFINE_integer("embedding_size", 25,
                         "Embedding size for embedding matrices.")
 tf.flags.DEFINE_integer("memory_size", 50, "Maximum size of memory.")
-tf.flags.DEFINE_integer("task_id",5 , "bAbI task id, 1 <= id <= 6")
+tf.flags.DEFINE_integer("task_id",1 , "bAbI task id, 1 <= id <= 6")
 tf.flags.DEFINE_integer("random_state", None, "Random state.")
 tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
@@ -91,7 +91,7 @@ class chatBot(object):
 
         if FLAGS.trained_emb:
             if os.path.exists(FLAGS.data_dir + '/new_embed.pkl'):
-                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed_'+FLAGS.task_id+'.pkl', 'rb'))
+                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl', 'rb'))
             else:
                 import build_embedding
                 # self.word_idx['<pad>'] = 0
@@ -105,7 +105,7 @@ class chatBot(object):
                 print('glove embedding_dim', len(emb_g[0]))
                 # pdb.set_trace()
                 emb, word2idx = build_embedding.idx_to_emb(FLAGS.data_dir+'/vocab.pkl', emb_size=25)
-                emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed_'+FLAGS.task_id+'.pkl')
+                emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed_'+str(FLAGS.task_id)+'.pkl')
                 emb_new=emb_new[1:] #delete the first meaningless word
                 my_embedding = emb_new
         else:
