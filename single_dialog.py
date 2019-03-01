@@ -118,7 +118,7 @@ class chatBot(object):
         self.model = MemN2NDialog(self.batch_size, self.vocab_size, self.n_cand, self.sentence_size,
                                   self.embedding_size, self.candidates_vec, session=self.sess,
                                   hops=self.hops, max_grad_norm=self.max_grad_norm, optimizer=optimizer,
-                                  task_id=task_id,introspection_times=self.intro_times,my_embedding=my_embedding)
+                                  task_id=self.task_id,introspection_times=self.intro_times,my_embedding=my_embedding)
         self.saver = tf.train.Saver(max_to_keep=1)
 
         self.summary_writer = tf.summary.FileWriter(
