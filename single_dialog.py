@@ -91,7 +91,8 @@ class chatBot(object):
 
         if FLAGS.trained_emb:
             if os.path.exists(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl'):
-                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl', 'rb'))
+                emb_new=pkl.load(open(FLAGS.data_dir + '/new_embed_'+str(FLAGS.task_id)+'.pkl', 'rb'))
+                my_embedding = emb_new[1:]
             else:
                 import build_embedding
                 # self.word_idx['<pad>'] = 0
