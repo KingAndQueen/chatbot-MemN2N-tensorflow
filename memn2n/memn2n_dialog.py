@@ -160,7 +160,7 @@ class MemN2NDialog(object):
 
         # gradient pipeline
         grads_and_vars = self._opt.compute_gradients(loss_op)
-        pdb.set_trace()
+        # pdb.set_trace()
         grads_and_vars = [(tf.clip_by_norm(g, self._max_grad_norm), v)
                           for g, v in grads_and_vars]
         # grads_and_vars = [(add_gradient_noise(g), v) for g,v in grads_and_vars]
@@ -205,7 +205,7 @@ class MemN2NDialog(object):
 
             if self._my_embedding is not None:
                 initial=tf.constant_initializer(value=self._my_embedding,dtype=tf.float32)
-                pdb.set_trace()
+                # pdb.set_trace()
                 # trained_emb=tf.get_variable('embedding_word', shape=[self._vocab_size, self._embedding_size],
                 #                 initializer=initial, trainable=True)
                 # A = tf.concat([nil_word_slot,initial ], 0)
