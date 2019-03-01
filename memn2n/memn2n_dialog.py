@@ -204,6 +204,7 @@ class MemN2NDialog(object):
             nil_word_slot = tf.zeros([1, self._embedding_size])
 
             if self._my_embedding is not None:
+                self._my_embedding = tf.concat([nil_word_slot, self._my_embedding], 0)
                 initial=tf.constant_initializer(value=self._my_embedding,dtype=tf.float32)
                 # pdb.set_trace()
                 # trained_emb=tf.get_variable('embedding_word', shape=[self._vocab_size, self._embedding_size],
