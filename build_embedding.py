@@ -12,7 +12,7 @@ def idx_to_emb(pickle_path,emb_size=100):
         word2idx = pkl.load(open(pickle_path, 'rb'))
         # word2idx=vocab_class.word2idx
         # idx2word=vocab_class.idx2word
-        vocab_size=len(word2idx)
+        vocab_size=len(word2idx)+1 # for self.word_idx is counted from 1 not 0
         print('old vocab size:',vocab_size)
         emb=np.random.normal(size=(vocab_size,emb_size))
         return emb,word2idx
