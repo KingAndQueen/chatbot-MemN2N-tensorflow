@@ -212,8 +212,8 @@ class MemN2NDialog(object):
                 self.A = tf.get_variable(name="A",shape=[self._vocab_size, self._embedding_size],initializer=initial)
                 self.H = tf.Variable(self._init(
                     [self._embedding_size, self._embedding_size]), name="H")
-                W = tf.concat([nil_word_slot, tf.get_variable('trained_embedding_W', shape=[self._vocab_size, self._embedding_size],initializer=initial, trainable=True)], 0)
-                self.W = tf.Variable(W, name="W")
+                # W = tf.concat([nil_word_slot, tf.get_variable('trained_embedding_W', shape=[self._vocab_size, self._embedding_size],initializer=initial, trainable=True)], 0)
+                self.W = tf.get_variable(name="W",shape=[self._vocab_size, self._embedding_size],initializer=initial)K
             else:
                 A = tf.concat([nil_word_slot, self._init(
                     [self._vocab_size - 1, self._embedding_size])], 0)
