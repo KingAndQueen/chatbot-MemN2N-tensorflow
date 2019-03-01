@@ -92,20 +92,23 @@ class chatBot(object):
         # self.candidates_vec=vectorize_candidates_sparse(candidates,self.word_idx)
 
         if FLAGS.trained_emb:
-            import build_embedding
-            self.word_idx['<pad>'] = 0
-            data_path = FLAGS.data_dir + '/vocab.pkl'
-            f = open(data_path, 'wb')
-            pkl.dump(self.word_idx, f)
-            f.close()
-            glove_path = './glove.twitter.27B.25d.txt'
-            vocab_g, emb_g = build_embedding.loadGlove(glove_path, emb_size=25)
-            print('glove vocab_size', len(vocab_g))
-            print('glove embedding_dim', len(emb_g[0]))
-            # pdb.set_trace()
-            emb, word2idx = build_embedding.idx_to_emb(FLAGS.data_dir+'/vocab.pkl', emb_size=25)
-            emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed.pkl')
-            my_embedding = emb_new #pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
+            if os.path.exists(FLAGS.data_dir + '/new_embed.pkl'):
+                my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
+            else:
+                import build_embedding
+                self.word_idx['<pad>'] = 0
+                data_path = FLAGS.data_dir + '/vocab.pkl'
+                f = open(data_path, 'wb')
+                pkl.dump(self.word_idx, f)
+                f.close()
+                glove_path = './glove.twitter.27B.25d.txt'
+                vocab_g, emb_g = build_embedding.loadGlove(glove_path, emb_size=25)
+                print('glove vocab_size', len(vocab_g))
+                print('glove embedding_dim', len(emb_g[0]))
+                # pdb.set_trace()
+                emb, word2idx = build_embedding.idx_to_emb(FLAGS.data_dir+'/vocab.pkl', emb_size=25)
+                emb_new = build_embedding.update_emb(emb, word2idx, vocab_g, emb_g, FLAGS.data_dir+'/new_embed.pkl')
+                my_embedding = emb_new
         else:
             my_embedding = None
 

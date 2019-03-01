@@ -59,10 +59,11 @@ def loadGlove(filename,emb_size=100):
     return vocab,embd
 
 if __name__=='__main__':
-    glove_path='./glove.twitter.27B.25d.txt'
+    glove_path='./data/dialog-bAbI-tasks/glove.twitter.27B.25d.txt'
     vocab_g,emb_g=loadGlove(glove_path,emb_size=25)
     print('glove vocab_size' , len(vocab_g))
     print('glove embedding_dim', len(emb_g[0]))
+    emb,word2idx=idx_to_emb('./data/dialog-bAbI-tasks/vocab.pkl',emb_size=25)
+    # a=pkl.load(open('./data/dialog-bAbI-tasks/new_embed.pkl', 'rb'))
     # pdb.set_trace()
-    emb,word2idx=idx_to_emb('./data/vocab.pkl',emb_size=25)
-    emb_new=update_emb(emb,word2idx,vocab_g,emb_g,'./data/new_embed.pkl')
+    emb_new=update_emb(emb,word2idx,vocab_g,emb_g,'./data/dialog-bAbI-tasks/new_embed.pkl')
