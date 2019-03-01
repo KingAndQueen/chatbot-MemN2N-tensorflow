@@ -206,13 +206,14 @@ class MemN2NDialog(object):
             if self._my_embedding is not None:
                 initial=tf.constant_initializer(value=self._my_embedding,dtype=tf.float32)
                 # pdb.set_trace()
-                trained_emb=tf.get_variable('embedding_word', shape=[self._vocab_size, self._embedding_size],
-                                initializer=initial, trainable=True)
-                A = tf.concat([nil_word_slot, trained_emb], 0)
-                self.A = tf.Variable(A, name="A")
+                # trained_emb=tf.get_variable('embedding_word', shape=[self._vocab_size, self._embedding_size],
+                #                 initializer=initial, trainable=True)
+                # A = tf.concat([nil_word_slot,initial ], 0)
+                self.A = tf.Variable(initial_value=initial, name="A")
                 self.H = tf.Variable(self._init(
                     [self._embedding_size, self._embedding_size]), name="H")
-                W = tf.concat([nil_word_slot, trained_emb], 0)
+                W = tf.concat([nil_word_slot, tf.get_variable('trained_embedding_W', shape=[self._vocab_size, self._embedding_size],
+                                initializer=initial, trainable=True)], 0)
                 self.W = tf.Variable(W, name="W")
             else:
                 A = tf.concat([nil_word_slot, self._init(
