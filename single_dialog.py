@@ -94,7 +94,7 @@ class chatBot(object):
                 my_embedding=pkl.load(open(FLAGS.data_dir + '/new_embed.pkl', 'rb'))
             else:
                 import build_embedding
-                self.word_idx['<pad>'] = 0
+                # self.word_idx['<pad>'] = 0
                 data_path = FLAGS.data_dir + '/vocab.pkl'
                 f = open(data_path, 'wb')
                 pkl.dump(self.word_idx, f)
