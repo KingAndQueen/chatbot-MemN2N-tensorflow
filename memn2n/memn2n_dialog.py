@@ -76,7 +76,7 @@ def find_lcseque(s1, s2):
 class MemN2NDialog(object):
     """End-To-End Memory Network."""
 
-    def __init__(self, batch_size, vocab_size, candidates_size, sentence_size, embedding_size,
+    def __init__(self, memory_size,batch_size, vocab_size, candidates_size, sentence_size, embedding_size,
                  candidates_vec,
                  hops=3,
                  max_grad_norm=40.0,
@@ -85,7 +85,7 @@ class MemN2NDialog(object):
                  optimizer=tf.train.AdamOptimizer(learning_rate=1e-2),
                  session=tf.Session(),
                  name='MemN2N',
-                 task_id=1,introspection_times=None):
+                 task_id=1,introspection_times=None,character_size=10,vocab_character_size=128):
         """Creates an End-To-End Memory Network
 
         Args:
@@ -137,9 +137,11 @@ class MemN2NDialog(object):
         self._opt = optimizer
         self._name = name
         self._candidates = candidates_vec
-
+        self._character_size = character_size
+        self._vocab_character_size = vocab_character_size
         self._build_inputs()
         self._build_vars()
+        self._build_vars_char()
         self._intro_times=introspection_times
         # define summary directory
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -148,7 +150,8 @@ class MemN2NDialog(object):
 
         # cross entropy
         # (batch_size, candidates_size)
-        logits = self._inference(self._stories, self._queries)
+        logits = self._inference(self._stories, self._queries,self._stories_char,
+                                 self._queries_char)
         cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
             logits=logits, labels=self._answers, name="cross_entropy")
         cross_entropy_sum = tf.reduce_sum(
@@ -191,11 +194,26 @@ class MemN2NDialog(object):
         self._sess.run(init_op)
 
     def _build_inputs(self):
+        self._stories_char = tf.placeholder(tf.int32,
+                                            [None, self._memory_size, self._sentence_size, self._character_size],
+                                            name="char_stories")
+        self._queries_char = tf.placeholder(tf.int32, [None, self._sentence_size, self._character_size],
+                                            name="char_queries")
         self._stories = tf.placeholder(
             tf.int32, [None, None, self._sentence_size], name="stories")
         self._queries = tf.placeholder(
             tf.int32, [None, self._sentence_size], name="queries")
         self._answers = tf.placeholder(tf.int32, [None], name="answers")
+
+    def _build_vars_char(self):
+        A_char = tf.random_normal([self._vocab_character_size, self._embedding_size], stddev=0.1)
+        self.A_1_char = tf.Variable(A_char, name="A")
+        C_char = tf.random_normal([self._vocab_character_size, self._embedding_size], stddev=0.1)
+        self.C_char = []
+
+        for hopn in range(self._hops):
+            with tf.variable_scope('hop_{}'.format(hopn)):
+                self.C_char.append(tf.Variable(C_char, name="C"))
 
     def _build_vars(self):
         with tf.variable_scope(self._name):
@@ -210,10 +228,41 @@ class MemN2NDialog(object):
             self.W = tf.Variable(W, name="W")
             # self.W = tf.Variable(self._init([self._vocab_size, self._embedding_size]), name="W")
         self._nil_vars = set([self.A.name, self.W.name])
+    def _cnn_character(self, word_emb, char_emb):
+        # pdb.set_trace()
+        char_emb = tf.transpose(char_emb, [0, 2, 3, 1])
+        conv1_weights = tf.Variable(
+            tf.truncated_normal([1, 5, self._sentence_size, self._sentence_size], stddev=0.1))
+        conv1_biases = tf.Variable(tf.zeros([self._sentence_size]), dtype=tf.float32)
+        # fc1_weights = tf.Variable(tf.truncated_normal(
+        #     [self._embedding_size, self._embedding_size], stddev=0.1))
+        # fc1_biases = tf.Variable(tf.constant(0.1, shape=[self._embedding_size]))
+        # pdb.set_trace()
+        conv = tf.nn.conv2d(char_emb, conv1_weights, strides=[1, 10, 1, 1], padding='SAME')
+        relu = tf.nn.relu(tf.nn.bias_add(conv, conv1_biases))
+        word_emb = tf.expand_dims(word_emb, 1)
+        word_emb = tf.transpose(word_emb, [0, 1, 3, 2])
+        conv_char_word = tf.concat([word_emb, relu], 2)
+        pool_c_ = tf.nn.max_pool(conv_char_word, ksize=[1, 1, 5, 1], strides=[1, 1, 2, 1], padding='SAME')
+        pool_c_ = tf.squeeze(pool_c_)
+        cnn_output = tf.transpose(pool_c_, [0, 2, 1])
+        # pool_shape = pool_c_.get_shape().as_list()
+        # reshape_c = tf.reshape(pool_c_, [-1, pool_shape[1] * pool_shape[2] * pool_shape[3]])
+        # cnn_output = tf.nn.relu(tf.matmul(reshape_c, fc1_weights) + fc1_biases)  # shape(pool_c)=word lens * 256
 
-    def _inference(self, stories, queries):
+
+        # input_shape=cnn_input.get_shape().as_list()
+        # weight=tf.get_variable('weight_char',[self._batch_size,input_shape[-3],1,input_shape[-2]],dtype=tf.float32)
+        # biases = tf.Variable(tf.constant(0.1, shape=[input_shape[-1]]))
+        # cnn_output=tf.nn.relu(tf.matmul(weight,cnn_input)+biases)
+        # cnn_output=tf.squeeze(cnn_output)
+        return cnn_output
+
+    def _inference(self, stories, queries,stories_char, queries_char):
         with tf.variable_scope(self._name):
             q_emb = tf.nn.embedding_lookup(self.A, queries)
+            q_emb_char = tf.nn.embedding_lookup(self.A_1_char, queries_char)
+            q_emb = self._cnn_character(q_emb, q_emb_char)
             u_0 = tf.reduce_sum(q_emb, 1)
             u = [u_0]
             for _ in range(self._hops):
@@ -245,7 +294,7 @@ class MemN2NDialog(object):
             # return
             # tf.transpose(tf.sparse_tensor_dense_matmul(self._candidates,tf.transpose(logits)))
 
-    def batch_fit(self, stories, queries, answers):
+    def batch_fit(self, stories, queries, answers,stories_char, queries_char):
         """Runs the training algorithm over the passed batch
 
         Args:
@@ -256,7 +305,7 @@ class MemN2NDialog(object):
         Returns:
             loss: floating-point number, the loss computed for the batch
         """
-        feed_dict = {self._stories: stories,
+        feed_dict = {self._stories_char: stories_char, self._queries_char: queries_char,self._stories: stories,
                      self._queries: queries, self._answers: answers}
         # pdb.set_trace()
         # try:

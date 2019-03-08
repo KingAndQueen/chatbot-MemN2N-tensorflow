@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from data_utils import load_dialog_task, vectorize_data, load_candidates, vectorize_candidates, \
-    vectorize_candidates_sparse, tokenize
+    vectorize_candidates_sparse, tokenize,character_data
 from sklearn import metrics
 from memn2n import MemN2NDialog
 from itertools import chain
@@ -35,7 +35,7 @@ tf.flags.DEFINE_string("model_dir", "model/",
 tf.flags.DEFINE_boolean('train', False, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
-tf.flags.DEFINE_boolean('introspect', True, 'whether use the introspect unit')
+tf.flags.DEFINE_boolean('introspect', False, 'whether use the introspect unit')
 tf.flags.DEFINE_integer("intro_times", 30, "times of introspect training.")
 FLAGS = tf.flags.FLAGS
 print("Started Task:", FLAGS.task_id)
@@ -94,10 +94,10 @@ class chatBot(object):
         optimizer = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate, epsilon=self.epsilon)
         self.sess = tf.Session()
-        self.model = MemN2NDialog(self.batch_size, self.vocab_size, self.n_cand, self.sentence_size,
+        self.model = MemN2NDialog(self.memory_size,self.batch_size, self.vocab_size, self.n_cand, self.sentence_size,
                                   self.embedding_size, self.candidates_vec, session=self.sess,
                                   hops=self.hops, max_grad_norm=self.max_grad_norm, optimizer=optimizer,
-                                  task_id=task_id,introspection_times=self.intro_times)
+                                  task_id=task_id,introspection_times=self.intro_times,character_size=10,vocab_character_size=128)
         self.saver = tf.train.Saver(max_to_keep=1)
 
         self.summary_writer = tf.summary.FileWriter(
@@ -167,6 +167,11 @@ class chatBot(object):
             nid += 1
 
     def train(self):
+        trainS_char, trainQ_char, trainA_char = character_data(self.trainData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
+
+        valS_char, valQ_char, valA_char =character_data(self.valData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
+        testS_char, testQ_char, testA_char = character_data(self.testData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
+
         trainS, trainQ, trainA, trainTag= vectorize_data(
             self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
         valS, valQ, valA, valTag = vectorize_data(
@@ -189,7 +194,10 @@ class chatBot(object):
                 s = trainS[start:end]
                 q = trainQ[start:end]
                 a = trainA[start:end]
-                cost_t = self.model.batch_fit(s, q, a)
+                s_c = trainS_char[start:end]
+                q_c = trainQ_char[start:end]
+
+                cost_t = self.model.batch_fit(s, q, a,s_c,q_c)
                 total_cost += cost_t
             if t % self.evaluation_interval == 0:
                 train_preds = self.batch_predict(trainS, trainQ, n_train)
