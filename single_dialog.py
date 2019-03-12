@@ -201,8 +201,8 @@ class chatBot(object):
                 cost_t = self.model.batch_fit(s, q, a,s_c,q_c)
                 total_cost += cost_t
             if t % self.evaluation_interval == 0:
-                train_preds = self.batch_predict(trainS, trainQ, n_train)
-                val_preds = self.batch_predict(valS, valQ, n_val)
+                train_preds = self.batch_predict(trainS, trainQ, n_train,trainS_char,trainQ_char)
+                val_preds = self.batch_predict(valS, valQ, n_val,valS_char, valQ_char)
                 train_acc = metrics.accuracy_score(
                     np.array(train_preds), trainA)
                 val_acc = metrics.accuracy_score(val_preds, valA)
@@ -251,7 +251,7 @@ class chatBot(object):
             test_acc = metrics.accuracy_score(test_preds, testA)
             print("Testing Accuracy:", test_acc)
 
-    def batch_predict(self, S, Q, n,testTag=None,introspect=False):
+    def batch_predict(self, S, Q, n,s_char,q_char,testTag=None,introspect=False):
 
         if introspect:
             print('introspection...')
@@ -261,7 +261,9 @@ class chatBot(object):
             end = start + self.batch_size
             s = S[start:end]
             q = Q[start:end]
-            pred = self.model.predict(s, q)
+            s_c = s_char[start:end]
+            q_c = q_char[start:end]
+            pred = self.model.predict(s, q,s_c,q_c)
             preds += list(pred)
         return preds
 

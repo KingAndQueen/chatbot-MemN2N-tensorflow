@@ -331,7 +331,7 @@ class MemN2NDialog(object):
         #     pdb.set_trace()
         return loss
 
-    def predict(self, stories, queries):
+    def predict(self, stories, queries,stories_char, queries_char):
         """Predicts answers as one-hot encoding.
 
         Args:
@@ -341,7 +341,7 @@ class MemN2NDialog(object):
         Returns:
             answers: Tensor (None, vocab_size)
         """
-        feed_dict = {self._stories: stories, self._queries: queries}
+        feed_dict = {self._stories_char: stories_char, self._queries_char: queries_char,self._stories: stories, self._queries: queries}
         return self._sess.run(self.predict_op, feed_dict=feed_dict)
 
 
