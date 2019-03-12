@@ -231,44 +231,52 @@ def vectorize_data(data, word_idx, sentence_size, batch_size, candidates_size, m
 def character_data(data, word_idx,idx_word, sentence_size, memory_size,character_len=10):
     S = []
     Q = []
-    A = []
+    # A = []
 
     for story, query, answer in data:
         ss = []
-        for i, sentence in enumerate(story, 1):
-            ls = max(0, sentence_size - len(sentence))
-            sents_char=[]
-            for w in sentence:
-                word_char = []
-                for ch in w:
-                    word_char.append(ord(ch))
-                ls_c=max(0,character_len-len(word_char))
-                for _ in range(ls_c):
-                    word_char.append(0)
-                sents_char.append(copy.copy(word_char))
-
-            for _ in range(ls):
-                sents_char.append([0]*character_len)
-            ss.append(copy.copy(sents_char))
-
         # pdb.set_trace()
-        # take only the most recent sentences that fit in memory
-        ss = ss[::-1][:memory_size][::-1]
+        if len(story)>0:
+            for i, sentence in enumerate(story, 1):
+                ls = max(0, sentence_size - len(sentence))
+                sents_char=[]
+                for w in sentence:
+                    w=w[:character_len]
+                    word_char = []
+                    for ch in w:
+                        word_char.append(ord(ch))
+                    ls_c=max(0,character_len-len(word_char))
+                    if len(word_char) > character_len:
+                        pdb.set_trace()
+                    for _ in range(ls_c):
+                        word_char.append(0)
+                    sents_char.append(copy.copy(word_char))
 
-        # Make the last word of each sentence the time 'word' which
-        # corresponds to vector of lookup table
-        for i in range(len(ss)):
-            sents_seq = len(word_idx) - memory_size - i + len(ss)
-            sents_seq_char=idx_word[sents_seq]
-            sents_seq_chars=[]
-            for c in sents_seq_char:
-                sents_seq_chars.append(ord(c))
-            ls_c = max(0, character_len - len(sents_seq_chars))
-            for _ in range(ls_c):
-                sents_seq_chars.append(0)
-            ss[i][-1]=copy.copy(sents_seq_chars)
+                for _ in range(ls):
+                    sents_char.append([0]*character_len)
+                # print(len(sents_char))
+                ss.append(copy.copy(sents_char))
 
-        # pad to memory_size
+            # pdb.set_trace()
+            # take only the most recent sentences that fit in memory
+            ss = ss[::-1][:memory_size][::-1]
+
+            # Make the last word of each sentence the time 'word' which
+            # corresponds to vector of lookup table
+            # for i in range(len(ss)):
+            #     sents_seq = len(word_idx) - memory_size - i + len(ss)
+            #     sents_seq_char=idx_word[sents_seq]
+            #     sents_seq_chars=[]
+            #     for c in sents_seq_char:
+            #         sents_seq_chars.append(ord(c))
+            #     ls_c = max(0, character_len - len(sents_seq_chars))
+            #     if len(sents_seq_chars) >character_len:
+            #         pdb.set_trace()
+            #     for _ in range(ls_c):
+            #         sents_seq_chars.append(0)
+            #     ss[i][-1]=copy.copy(sents_seq_chars)
+
+            # pad to memory_size
         lm = max(0, memory_size - len(ss))
         for _ in range(lm):
             word_pad=[0]*character_len
@@ -277,10 +285,13 @@ def character_data(data, word_idx,idx_word, sentence_size, memory_size,character
                 sent_pad.append(word_pad)
             ss.append(sent_pad)
 
+        if np.array(ss).shape[-1]>character_len:
+            pdb.set_trace()
         lq = max(0, sentence_size - len(query))
         # q = [word_idx[w] for w in query] + [0] * lq
         q=[]
         for w in query:
+            w = w[:character_len]
             word_char = []
             for ch in w:
                 word_char.append(ord(ch))
@@ -291,12 +302,14 @@ def character_data(data, word_idx,idx_word, sentence_size, memory_size,character
         for _ in range(lq):
             q.append([0] * character_len)
 
-        y = np.zeros(len(word_idx) + 1)  # 0 is reserved for nil word
-        for a in answer:
-            y[word_idx[a]] = 1
+        # y = np.zeros(len(word_idx) + 1)  # 0 is reserved for nil word
+        # for a in answer:
+        #     y[word_idx[a]] = 1
 
         S.append(np.array(ss))
         Q.append(q)
-        A.append(y)
+        # print(np.array(ss).shape)
+        # pdb.set_trace()
+        # A.append(y)
     # pdb.set_trace()
-    return np.array(S), np.array(Q), np.array(A)
+    return np.array(S), np.array(Q),None# np.array(A)

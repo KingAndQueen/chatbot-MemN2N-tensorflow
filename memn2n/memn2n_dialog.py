@@ -124,7 +124,7 @@ class MemN2NDialog(object):
 
             name: Name of the End-To-End Memory Network. Defaults to `MemN2N`.
         """
-
+        self._memory_size=memory_size
         self._batch_size = batch_size
         self._vocab_size = vocab_size
         self._candidates_size = candidates_size
@@ -162,6 +162,7 @@ class MemN2NDialog(object):
 
         # gradient pipeline
         grads_and_vars = self._opt.compute_gradients(loss_op)
+        # pdb.set_trace()
         grads_and_vars = [(tf.clip_by_norm(g, self._max_grad_norm), v)
                           for g, v in grads_and_vars]
         # grads_and_vars = [(add_gradient_noise(g), v) for g,v in grads_and_vars]
@@ -228,6 +229,7 @@ class MemN2NDialog(object):
             self.W = tf.Variable(W, name="W")
             # self.W = tf.Variable(self._init([self._vocab_size, self._embedding_size]), name="W")
         self._nil_vars = set([self.A.name, self.W.name])
+
     def _cnn_character(self, word_emb, char_emb):
         # pdb.set_trace()
         char_emb = tf.transpose(char_emb, [0, 2, 3, 1])
@@ -246,16 +248,25 @@ class MemN2NDialog(object):
         pool_c_ = tf.nn.max_pool(conv_char_word, ksize=[1, 1, 5, 1], strides=[1, 1, 2, 1], padding='SAME')
         pool_c_ = tf.squeeze(pool_c_)
         cnn_output = tf.transpose(pool_c_, [0, 2, 1])
-        # pool_shape = pool_c_.get_shape().as_list()
-        # reshape_c = tf.reshape(pool_c_, [-1, pool_shape[1] * pool_shape[2] * pool_shape[3]])
-        # cnn_output = tf.nn.relu(tf.matmul(reshape_c, fc1_weights) + fc1_biases)  # shape(pool_c)=word lens * 256
 
+        return cnn_output
 
-        # input_shape=cnn_input.get_shape().as_list()
-        # weight=tf.get_variable('weight_char',[self._batch_size,input_shape[-3],1,input_shape[-2]],dtype=tf.float32)
-        # biases = tf.Variable(tf.constant(0.1, shape=[input_shape[-1]]))
-        # cnn_output=tf.nn.relu(tf.matmul(weight,cnn_input)+biases)
-        # cnn_output=tf.squeeze(cnn_output)
+    def _cnn_character2(self, word_emb, char_emb, variable_scope, reuse=None):
+        with tf.variable_scope(variable_scope, reuse=reuse):
+            # pdb.set_trace()
+            input_shape = char_emb.get_shape().as_list()
+            cnn_input = tf.reshape(char_emb, [-1, input_shape[1], input_shape[2] * input_shape[3], input_shape[4]])
+            conv1_weights = tf.Variable(
+                tf.truncated_normal([1, 5, self._memory_size, self._memory_size], stddev=0.1))
+            conv1_biases = tf.Variable(tf.zeros([self._memory_size]), dtype=tf.float32)
+            cnn_input = tf.transpose(cnn_input, [0, 2, 3, 1])
+            conv = tf.nn.conv2d(cnn_input, conv1_weights, strides=[1, 10, 1, 1], padding='SAME')
+            relu = tf.nn.relu(tf.nn.bias_add(conv, conv1_biases))
+            word_emb = tf.transpose(word_emb, [0, 2, 3, 1])
+            conv_char_word = tf.concat([word_emb, relu], 2)
+            pool_c_ = tf.nn.max_pool(conv_char_word, ksize=[1, 1, 5, 1], strides=[1, 1, 2, 1], padding='SAME')
+            cnn_output = tf.transpose(pool_c_, [0, 3, 1, 2])
+
         return cnn_output
 
     def _inference(self, stories, queries,stories_char, queries_char):
@@ -265,8 +276,10 @@ class MemN2NDialog(object):
             q_emb = self._cnn_character(q_emb, q_emb_char)
             u_0 = tf.reduce_sum(q_emb, 1)
             u = [u_0]
-            for _ in range(self._hops):
+            for hop in range(self._hops):
                 m_emb = tf.nn.embedding_lookup(self.A, stories)
+                m_emb_C_char = tf.nn.embedding_lookup(self.C_char[hop], stories_char)
+                m_emb = self._cnn_character2(m_emb, m_emb_C_char, tf.get_variable_scope())
                 m = tf.reduce_sum(m_emb, 2)
                 # hack to get around no reduce_dot
                 u_temp = tf.transpose(tf.expand_dims(u[-1], -1), [0, 2, 1])

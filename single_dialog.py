@@ -26,13 +26,13 @@ tf.flags.DEFINE_integer("epochs", 200, "Number of epochs to train for.")
 tf.flags.DEFINE_integer("embedding_size", 20,
                         "Embedding size for embedding matrices.")
 tf.flags.DEFINE_integer("memory_size", 50, "Maximum size of memory.")
-tf.flags.DEFINE_integer("task_id",5 , "bAbI task id, 1 <= id <= 6")
+tf.flags.DEFINE_integer("task_id",1 , "bAbI task id, 1 <= id <= 6")
 tf.flags.DEFINE_integer("random_state", None, "Random state.")
 tf.flags.DEFINE_string("data_dir", "data/dialog-bAbI-tasks/",
                        "Directory containing bAbI tasks")
 tf.flags.DEFINE_string("model_dir", "model/",
                        "Directory containing memn2n model checkpoints")
-tf.flags.DEFINE_boolean('train', False, 'if True, begin to train')
+tf.flags.DEFINE_boolean('train', True, 'if True, begin to train')
 tf.flags.DEFINE_boolean('interactive', False, 'if True, interactive')
 tf.flags.DEFINE_boolean('OOV', True, 'if True, use OOV test set')
 tf.flags.DEFINE_boolean('introspect', False, 'whether use the introspect unit')
@@ -167,7 +167,8 @@ class chatBot(object):
             nid += 1
 
     def train(self):
-        trainS_char, trainQ_char, trainA_char = character_data(self.trainData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
+        # pdb.set_trace()
+        trainS_char, trainQ_char,_ = character_data(self.trainData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
 
         valS_char, valQ_char, valA_char =character_data(self.valData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
         testS_char, testQ_char, testA_char = character_data(self.testData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
