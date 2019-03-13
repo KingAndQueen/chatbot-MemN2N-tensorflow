@@ -171,7 +171,6 @@ class chatBot(object):
         trainS_char, trainQ_char,_ = character_data(self.trainData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
 
         valS_char, valQ_char, valA_char =character_data(self.valData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
-        testS_char, testQ_char, testA_char = character_data(self.testData, self.word_idx, self.idx_word, self.sentence_size, self.memory_size)
 
         trainS, trainQ, trainA, trainTag= vectorize_data(
             self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
@@ -231,9 +230,11 @@ class chatBot(object):
 
     def test(self,introspect=False):
         print('begin test...')
-        trainS, trainQ, trainA, trainTag = vectorize_data(
-            self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
-        self.train_data = [trainS, trainQ, trainA, trainTag]
+        # trainS, trainQ, trainA, trainTag = vectorize_data(
+        #     self.trainData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
+        # self.train_data = [trainS, trainQ, trainA, trainTag]
+        testS_char, testQ_char, testA_char = character_data(self.testData, self.word_idx, self.idx_word,
+                                                            self.sentence_size, self.memory_size)
 
         ckpt = tf.train.get_checkpoint_state(self.model_dir)
         if ckpt and ckpt.model_checkpoint_path:
@@ -247,7 +248,7 @@ class chatBot(object):
                 self.testData, self.word_idx, self.sentence_size, self.batch_size, self.n_cand, self.memory_size)
             n_test = len(testS)
             print("Testing Size", n_test)
-            test_preds = self.batch_predict(testS, testQ, n_test,testTag,introspect)
+            test_preds = self.batch_predict(testS, testQ, n_test,testS_char, testQ_char,testTag,introspect)
             test_acc = metrics.accuracy_score(test_preds, testA)
             print("Testing Accuracy:", test_acc)
 
